@@ -1,0 +1,18 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "cSpell.words": [
+        "wgrib",
+        "amsokol",
+        "verftime",
+        "Verf",
+        "grib",
+        "dtime",
+        "mtab",
+        "infile",
+        "pgrb",
+        "gribs",
+        "Wrapf",
+        "dlen"
+    ],
+    "go.buildOnSave": "package"
+}
