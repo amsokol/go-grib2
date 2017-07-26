@@ -22,6 +22,34 @@ func code_table_3_1(sec [][]unsigned_char) int {
 	return int(uint2(sec[3][12:]))
 }
 
+func code_table_3_2_location(sec [][]unsigned_char) []unsigned_char {
+	var grid_def, center int
+	grid_def = code_table_3_1(sec)
+
+	if grid_def < 50 {
+		return sec[3][14:]
+	}
+
+	switch grid_def {
+	case 90, 110, 130, 140, 204, 1000, 1100:
+		return sec[3][14:]
+	default:
+	}
+
+	center = GB2_Center(sec)
+	if center == NCEP {
+		if grid_def == 32768 || (grid_def == 32769) {
+			return sec[3][14:]
+		}
+	}
+	if (center == JMA1) || (center == JMA2) {
+		if grid_def == 40110 {
+			return sec[3][14:]
+		}
+	}
+	return nil
+}
+
 func code_table_4_0(sec [][]unsigned_char) int {
 	return GB2_ProdDefTemplateNo(sec)
 }

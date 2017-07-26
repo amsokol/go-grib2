@@ -136,3 +136,43 @@ func GDS_RotLatLon_sp_lon(gds []unsigned_char) unsigned_int {
 func GDS_RotLatLon_rotation(gds []unsigned_char) unsigned_int {
 	return uint4(gds[80:])
 }
+
+// #define GDS_Mercator_dy(gds)		((uint4(gds+68))*0.001)
+func GDS_Mercator_dy(gds []unsigned_char) double {
+	return double(uint4(gds[68:])) * 0.001
+}
+
+// #define GDS_Mercator_dx(gds)		((uint4(gds+64))*0.001)
+func GDS_Mercator_dx(gds []unsigned_char) double {
+	return double(uint4(gds[64:])) * 0.001
+}
+
+// #define GDS_Mercator_lat1(gds)		(int4(gds+38)*0.000001)
+func GDS_Mercator_lat1(gds []unsigned_char) double {
+	return double(int4(gds[38:])) * 0.000001
+}
+
+// #define GDS_Mercator_lat2(gds)		(int4(gds+51)*0.000001)
+func GDS_Mercator_lat2(gds []unsigned_char) double {
+	return double(int4(gds[51:])) * 0.000001
+}
+
+// #define GDS_Mercator_lon1(gds)		(uint4(gds+42)*0.000001)
+func GDS_Mercator_lon1(gds []unsigned_char) double {
+	return double(uint4(gds[42:])) * 0.000001
+}
+
+// #define GDS_Mercator_lon2(gds)		(uint4(gds+55)*0.000001)
+func GDS_Mercator_lon2(gds []unsigned_char) double {
+	return double(uint4(gds[55:])) * 0.000001
+}
+
+// #define GDS_Mercator_ori_angle(gds)	(uint4(gds+60)*0.000001)
+func GDS_Mercator_ori_angle(gds []unsigned_char) double {
+	return double(uint4(gds[60:])) * 0.000001
+}
+
+// #define GDS_Mercator_latD(gds)		(int4(gds+47)*0.000001)
+func GDS_Mercator_latD(gds []unsigned_char) double {
+	return double(int4(gds[47:])) * 0.000001
+}

@@ -75,3 +75,13 @@ func scaled2flt(scale_factor int, scale_value int) float {
 	}
 	return float(double(scale_value) / Int_Power(10.0, scale_factor))
 }
+
+func scaled2dbl(scale_factor int, scale_value int) double {
+	if scale_factor == 0 {
+		return double(scale_value)
+	}
+	if scale_factor < 0 {
+		return double(scale_value) * Int_Power(10.0, -scale_factor)
+	}
+	return double(scale_value) / Int_Power(10.0, scale_factor)
+}

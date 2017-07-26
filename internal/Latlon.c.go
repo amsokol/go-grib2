@@ -48,11 +48,9 @@ func get_latlon(sec [][]unsigned_char, lon *[]double, lat *[]double) error {
 	if grid_template == 0 {
 		return regular2ll(sec, lat, lon)
 	} else if grid_template == 1 { // rotated lat-lon
-		// TODO: port rot_regular2ll
 		rot_regular2ll(sec, lat, lon)
 	} else if grid_template == 10 {
-		// TODO: port mercator2ll
-		// mercator2ll(sec, lat, lon)
+		mercator2ll(sec, lat, lon)
 	} else if grid_template == 20 {
 		// TODO: port polar2ll
 		// polar2ll(sec, lat, lon)

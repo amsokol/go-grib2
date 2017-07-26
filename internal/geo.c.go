@@ -248,3 +248,140 @@ func rot_regular2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
 	}
 	return nil
 }
+
+func mercator2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
+
+	var dx, dy, lat1, lat2, lon1, lon2 double
+	var llat, llon []double
+	var i, j unsigned_int
+	var dlon, circum double
+
+	var n, s, e, w, tmp, error_ double
+	var gds []unsigned_char
+
+	var nnx, nny unsigned_int
+	var nres, nscan int
+	var nnpnts unsigned_int
+
+	var n_variable_dim int
+	var variable_dim, raw_variable_dim []int
+
+	get_nxny_(sec, &nnx, &nny, &nnpnts, &nres, &nscan, &n_variable_dim, &variable_dim, &raw_variable_dim)
+	gds = sec[3]
+
+	dy = GDS_Mercator_dy(gds)
+	dx = GDS_Mercator_dx(gds)
+	lat1 = GDS_Mercator_lat1(gds)
+	lat2 = GDS_Mercator_lat2(gds)
+	lon1 = GDS_Mercator_lon1(gds)
+	lon2 = GDS_Mercator_lon2(gds)
+
+	if lon1 < 0.0 || lon2 < 0.0 || lon1 > 360.0 || lon2 > 360.0 {
+		return fatal_error("BAD GDS lon", "")
+	}
+	if lat1 < -90.0 || lat2 < -90.0 || lat1 > 90.0 || lat2 > 90.0 {
+		return fatal_error("BAD GDS lat", "")
+	}
+
+	if GDS_Mercator_ori_angle(gds) != 0.0 {
+		return fprintf("cannot handle non-zero mercator orientation angle %f\n",
+			double(GDS_Mercator_ori_angle(gds)))
+	}
+
+	if nnx < 1 || nny < 1 {
+		return fprintf("Sorry geo/mercator code does not handle variable nx/ny yet\n")
+	}
+
+	/*
+			if ((*lat = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+		        fatal_error("mercator2ll memory allocation failed","");
+		    }
+		    if ((*lon = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+		        fatal_error("mercator2ll memory allocation failed","");
+		    }
+	*/
+	*lat = make([]double, nnpnts, nnpnts)
+	*lon = make([]double, nnpnts, nnpnts)
+
+	/* now figure out the grid coordinates mucho silly grib specification */
+
+	/* find S and N latitude */
+	if GDS_Scan_y(nscan) {
+		s = lat1
+		n = lat2
+	} else {
+		s = lat2
+		n = lat1
+	}
+	if s > n {
+		fatal_error("Mercator grid: lat1 and lat2", "")
+	}
+
+	/* find W and E longitude */
+
+	if ((nscan & 16) == 16) && (nny%2 == 0) && ((nres & 32) == 0) {
+		fatal_error("grib GDS ambiguity", "")
+	}
+
+	if ((nscan & 16) == 16) && (nny%2 == 0) {
+		fatal_error("more code needed to decode GDS", "")
+	}
+
+	if GDS_Scan_x(nscan) {
+		w = lon1
+		e = lon2
+	} else {
+		w = lon2
+		e = lon1
+	}
+	if e <= w {
+		e += 360.0
+	}
+
+	llat = *lat
+	llon = *lon
+
+	dlon = (e - w) / double(nnx-1)
+	radius, err := radius_earth(sec)
+	if err != nil {
+		return fatal_error_wrap(err, "Failed to execute radius_earth")
+	}
+	circum = 2.0 * M_PI * radius * cos(double(GDS_Mercator_latD(gds))*(M_PI/180.0))
+	dx = dx * 360.0 / circum
+
+	// dlon should be almost == to dx
+	// replace dx by dlon to get end points to match
+
+	if dx != 0.0 {
+		error_ = fabs(dx-dlon) / fabs(dx)
+		if error_ >= 0.001 {
+			return fprintf("\n*** Mercator grid error: inconsistent d-longitude, radius and grid domain\n*** d-longitude from grid domain %f (used), d-longitude from dx %f (not used)\n", dlon, dx)
+		}
+		dx = dlon
+	}
+
+	s = log(tan((45 + s/2) * M_PI / 180))
+	n = log(tan((45 + n/2) * M_PI / 180))
+	dy = (n - s) / (double(nny) - 1)
+
+	llat_index := 0
+	for j = 0; j < nny; j++ {
+		tmp = (atan(exp(s+double(j)*dy))*180/M_PI - 45) * 2
+		for i = 0; i < nnx; i++ {
+			llat[llat_index] = tmp
+			llat_index++
+		}
+	}
+
+	for j = 0; j < nnx; j++ {
+		if w+double(j)*dx >= 360.0 {
+			llon[j] = w + double(j)*dx - 360.0
+		} else {
+			llon[j] = w + double(j)*dx
+		}
+	}
+	for j = nnx; j < nnpnts; j++ {
+		llon[j] = llon[j-nnx]
+	}
+	return nil
+} /* end mercator2ll() */

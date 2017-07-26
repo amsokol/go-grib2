@@ -83,7 +83,7 @@ func unpk_grib(sec [][]unsigned_char, data []float) error {
 		if nbits == 0 {
 			tmp = float(reference * dec_scale)
 			if packing == 61 {
-				tmp = exp(tmp) - float(b)
+				tmp = float(exp(double(tmp)) - b)
 			} // remove log prescaling
 			if bitmap_flag == 255 {
 				for ii = 0; ii < ndata; ii++ {
@@ -126,7 +126,7 @@ func unpk_grib(sec [][]unsigned_char, data []float) error {
 			// #pragma omp parallel for private(ii) schedule(static)
 			for ii = 0; ii < ndata; ii++ {
 				if DEFINED_VAL(data[ii]) {
-					data[ii] = exp(data[ii]) - float(b)
+					data[ii] = float(exp(double(data[ii])) - b)
 				}
 			}
 		}

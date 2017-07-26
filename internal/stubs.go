@@ -58,8 +58,8 @@ func Int_Power(x double, y int) double {
 	return double(math.Pow(float64(x), float64(y)))
 }
 
-func exp(v float) float {
-	return float(math.Exp(float64(v)))
+func exp(v double) double {
+	return double(math.Exp(float64(v)))
 }
 
 func sin(v double) double {
@@ -76,6 +76,18 @@ func asin(v double) double {
 
 func atan2(x, y double) double {
 	return double(math.Atan2(float64(x), float64(y)))
+}
+
+func log(v double) double {
+	return double(math.Log(float64(v)))
+}
+
+func tan(v double) double {
+	return double(math.Tan(float64(v)))
+}
+
+func atan(v double) double {
+	return double(math.Atan(float64(v)))
 }
 
 func fatal_error(format string, args ...interface{}) error {
