@@ -142,11 +142,11 @@ var shift = []double{1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0}
 
 func unpk_0(flt []float, bits0 []unsigned_char, bitmap0 []unsigned_char, n_bits int, n unsigned_int, ref double, scale double, dec_scale double) error {
 
-	var /*bits,*/ bitmap []unsigned_char
+	var bits, bitmap []unsigned_char
 
-	var /*c_bits, j_bits,*/ nthreads int
-	var /*map_mask,*/ bbits, i, j, k, n_missing, ndef, di unsigned_int
-	/*var jj double*/
+	var c_bits, j_bits, nthreads int
+	var map_mask, bbits, i, j, k, n_missing, ndef, di unsigned_int
+	var jj double
 
 	ref = ref * dec_scale
 	scale = scale * dec_scale
@@ -223,53 +223,50 @@ func unpk_0(flt []float, bits0 []unsigned_char, bitmap0 []unsigned_char, n_bits 
 			}
 		}
 	} else {
-		return fatal_error("I can't port this crazy code!")
-		// TODO: port this code
 		/* older unoptimized code, not often used */
-		/*
-			c_bits = 8
-			map_mask = 128
-			flt_index := 0
-			for n > 0 {
-				n--
-				if bitmap {
-					j = (*bitmap & map_mask)
-					//if ((map_mask >>= 1) == 0) {
-					map_mask = map_mask >> 1
-					if map_mask == 0 {
-						map_mask = 128
-						bitmap++
-					}
-					if j == 0 {
-						flt[flt_index] = UNDEFINED
-						flt_index++
-						continue
-					}
+		c_bits = 8
+		map_mask = 128
+		flt_index := 0
+		bitmap_index := 0
+		bits_index := 0
+		for n > 0 {
+			n--
+			if bitmap != nil {
+				j = unsigned_int(bitmap[bitmap_index]) & map_mask
+				//if ((map_mask >>= 1) == 0) {
+				map_mask = map_mask >> 1
+				if map_mask == 0 {
+					map_mask = 128
+					bitmap_index++
 				}
-
-				jj = 0.0
-				j_bits = n_bits
-				bits_index := 0
-				for c_bits <= j_bits {
-					if c_bits == 8 {
-						jj = jj*256.0 + double(bits[bits_index])
-						bits_index++
-						j_bits -= 8
-					} else {
-						jj = (jj * shift[c_bits]) + (double)(*bits&mask[c_bits])
-						bits++
-						j_bits -= c_bits
-						c_bits = 8
-					}
+				if j == 0 {
+					flt[flt_index] = UNDEFINED
+					flt_index++
+					continue
 				}
-				if j_bits {
-					c_bits -= j_bits
-					jj = (jj * shift[j_bits]) + (double)((*bits>>c_bits)&mask[j_bits])
-				}
-				flt[flt_index] = ref + scale*jj
-				flt_index++
 			}
-		*/
+
+			jj = 0.0
+			j_bits = n_bits
+			for c_bits <= j_bits {
+				if c_bits == 8 {
+					jj = jj*256.0 + double(bits[bits_index])
+					bits_index++
+					j_bits -= 8
+				} else {
+					jj = (jj * shift[c_bits]) + double(int(bits[bits_index])&mask[c_bits])
+					bits_index++
+					j_bits -= c_bits
+					c_bits = 8
+				}
+			}
+			if j_bits != 0 {
+				c_bits -= j_bits
+				jj = (jj * shift[j_bits]) + double((int(bits[bits_index])>>unsigned_int(c_bits))&mask[j_bits])
+			}
+			flt[flt_index] = float(ref + scale*jj)
+			flt_index++
+		}
 	}
 	return nil
 }
