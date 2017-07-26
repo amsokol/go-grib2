@@ -1,5 +1,8 @@
 package internal
 
+// #define M_PI           3.14159265358979323846  /* pi */
+const M_PI = 3.14159265358979323846
+
 func regular2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
 
 	var basic_ang, sub_ang int
@@ -187,3 +190,61 @@ func regular2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
 	}
 	return nil
 } /* end regular2ll() */
+
+func rot_regular2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
+
+	var gds []unsigned_char
+	var units double
+	var tlon, tlat []double
+	var sp_lat, sp_lon, angle_rot double
+	var sin_a, cos_a double
+	var basic_ang, sub_ang int
+	var i, npnts unsigned_int
+	var a, b, r, pr, gr, pm, gm, glat, glon double
+
+	/* get the lat-lon coordinates in rotated frame of referencee */
+	err := regular2ll(sec, lat, lon)
+	if err != nil {
+		return fatal_error_wrap(err, "Failed to execute regular2ll")
+	}
+
+	gds = sec[3]
+	npnts = GB2_Sec3_npts(sec)
+
+	basic_ang = GDS_LatLon_basic_ang(gds)
+	sub_ang = GDS_LatLon_sub_ang(gds)
+	if basic_ang != 0 {
+		units = double(basic_ang) / double(sub_ang)
+	} else {
+		units = 0.000001
+	}
+
+	sp_lat = double(GDS_RotLatLon_sp_lat(gds)) * units
+	sp_lon = double(GDS_RotLatLon_sp_lon(gds)) * units
+	angle_rot = double(GDS_RotLatLon_rotation(gds)) * units
+
+	a = (M_PI / 180.0) * (90.0 + sp_lat)
+	b = (M_PI / 180.0) * sp_lon
+	r = (M_PI / 180.0) * angle_rot
+
+	sin_a = sin(a)
+	cos_a = cos(a)
+
+	tlat = *lat
+	tlon = *lon
+	tlat_index := 0
+	tlon_index := 0
+	for i = 0; i < npnts; i++ {
+		pr = (M_PI / 180.0) * tlat[tlat_index]
+		gr = -(M_PI / 180.0) * tlon[tlon_index]
+		pm = asin(cos(pr) * cos(gr))
+		gm = atan2(cos(pr)*sin(gr), -sin(pr))
+		glat = (180.0 / M_PI) * (asin(sin_a*sin(pm) - cos_a*cos(pm)*cos(gm-r)))
+		glon = -(180.0 / M_PI) * (-b + atan2(cos(pm)*sin(gm-r), sin_a*cos(pm)*cos(gm-r)+cos_a*sin(pm)))
+		tlat[tlat_index] = glat
+		tlat_index++
+		tlon[tlon_index] = glon
+		tlon_index++
+	}
+	return nil
+}

@@ -62,6 +62,22 @@ func exp(v float) float {
 	return float(math.Exp(float64(v)))
 }
 
+func sin(v double) double {
+	return double(math.Sin(float64(v)))
+}
+
+func cos(v double) double {
+	return double(math.Cos(float64(v)))
+}
+
+func asin(v double) double {
+	return double(math.Asin(float64(v)))
+}
+
+func atan2(x, y double) double {
+	return double(math.Atan2(float64(x), float64(y)))
+}
+
 func fatal_error(format string, args ...interface{}) error {
 	return errors.Errorf(format, args)
 }

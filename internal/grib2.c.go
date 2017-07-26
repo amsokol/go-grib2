@@ -121,3 +121,18 @@ func GB2_ParmNum(sec [][]unsigned_char) int {
 func GB2_Subcenter(sec [][]unsigned_char) int {
 	return UINT2(sec[1][7], sec[1][8])
 }
+
+// #define GDS_RotLatLon_sp_lat(gds)	(int4(gds+72))
+func GDS_RotLatLon_sp_lat(gds []unsigned_char) int {
+	return int4(gds[72:])
+}
+
+// #define GDS_RotLatLon_sp_lon(gds)	(uint4(gds+76))
+func GDS_RotLatLon_sp_lon(gds []unsigned_char) unsigned_int {
+	return uint4(gds[76:])
+}
+
+// #define GDS_RotLatLon_rotation(gds)	(int4(gds+80))
+func GDS_RotLatLon_rotation(gds []unsigned_char) unsigned_int {
+	return uint4(gds[80:])
+}
