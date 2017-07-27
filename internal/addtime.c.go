@@ -4,22 +4,6 @@ import (
 	"time"
 )
 
-/*
-   This routine reads year/month/day.../second byte code and saves it in variables
-*/
-/*
- int get_time(unsigned char *p, int *year, int *month, int *day, int *hour, int *minute, int *second) {
-    *year = (p[0] << 8) | p[1];
-    p += 2;
-    *month = (int) *p++;
-    *day = (int) *p++;
-    *hour = (int) *p++;
-    *minute = (int) *p++;
-    *second = (int) *p;
-    return 0;
-}
-*/
-
 func get_time(p []unsigned_char, year *int, month *int, day *int, hour *int, minute *int, second *int) {
 	*year = (int(p[0]) << 8) | int(p[1])
 	*month = int(p[2])
