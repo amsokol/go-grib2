@@ -12,7 +12,8 @@
         "pgrb",
         "gribs",
         "Wrapf",
-        "dlen"
+        "dlen",
+        "golang"
     ],
     "go.buildOnSave": "package"
 }
