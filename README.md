@@ -1,4 +1,4 @@
-# GRIB2 library for golang
+# GRIB2 library for Go programming language (golang)
 
 ## History
 
