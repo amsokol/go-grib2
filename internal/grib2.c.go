@@ -211,3 +211,43 @@ func GDS_Polar_dy(gds []unsigned_char) double {
 func GDS_Polar_sps(gds []unsigned_char) bool {
 	return (gds[63] & 128) == 128
 }
+
+// #define GDS_Lambert_dy(gds)		(int4(gds+59) * 0.001)
+func GDS_Lambert_dy(gds []unsigned_char) double {
+	return double(int4(gds[59:])) * 0.001
+}
+
+// #define GDS_Lambert_dx(gds)		(int4(gds+55) * 0.001)
+func GDS_Lambert_dx(gds []unsigned_char) double {
+	return double(int4(gds[55:])) * 0.001
+}
+
+// #define GDS_Lambert_La1(gds)		(int4(gds+38) * 0.000001)
+func GDS_Lambert_La1(gds []unsigned_char) double {
+	return double(int4(gds[38:])) * 0.000001
+}
+
+// #define GDS_Lambert_Lo1(gds)		(int4(gds+42) * 0.000001)
+func GDS_Lambert_Lo1(gds []unsigned_char) double {
+	return double(int4(gds[42:])) * 0.000001
+}
+
+// #define GDS_Lambert_Lov(gds)		(int4(gds+51) * 0.000001)
+func GDS_Lambert_Lov(gds []unsigned_char) double {
+	return double(int4(gds[51:])) * 0.000001
+}
+
+// #define GDS_Lambert_Latin1(gds)		(int4(gds+65) * 0.000001)
+func GDS_Lambert_Latin1(gds []unsigned_char) double {
+	return double(int4(gds[65:])) * 0.000001
+}
+
+// #define GDS_Lambert_Latin2(gds)		(int4(gds+69) * 0.000001)
+func GDS_Lambert_Latin2(gds []unsigned_char) double {
+	return double(int4(gds[69:])) * 0.000001
+}
+
+// #define GDS_Lambert_LatD(gds)		(int4(gds+47) * 0.000001)
+func GDS_Lambert_LatD(gds []unsigned_char) double {
+	return double(int4(gds[47:])) * 0.000001
+}

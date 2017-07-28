@@ -55,6 +55,14 @@ func ldexp(frac double, exp int) double {
 	return double(math.Ldexp(float64(frac), exp))
 }
 
+func pow(x, y double) double {
+	return double(math.Pow(float64(x), float64(y)))
+}
+
+func sqrt(x double) double {
+	return double(math.Sqrt(float64(x)))
+}
+
 func Int_Power(x double, y int) double {
 	return double(math.Pow(float64(x), float64(y)))
 }

@@ -1,7 +1,14 @@
 package internal
 
-// #define M_PI           3.14159265358979323846  /* pi */
 const M_PI = 3.14159265358979323846
+
+const M_PI_4 = 0.78539816339744830962 /* pi/4 */
+
+const M_PI_2 = 1.57079632679489661923 /* pi/2 */
+
+func todegrees(x double) double {
+	return x * (180.0 / M_PI)
+}
 
 func regular2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
 
@@ -498,3 +505,136 @@ func polar2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
 	}
 	return nil
 }
+
+func lambert2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
+
+	var n double
+	var lat, lon []double
+
+	var dx, dy, lat1r, lon1r, lon2d, lon2r, latin1r, latin2r double
+	var lond, latd, d_lon double
+	var f, rho, rhoref, theta, startx, starty double
+	var nnx, nny unsigned_int
+	var nres, nscan int
+	var x, y, tmp double
+	var gds []unsigned_char
+	var latDr double
+	var earth_radius double
+	var j, nnpnts unsigned_int
+
+	var n_variable_dim int
+	var variable_dim, raw_variable_dim []int
+
+	get_nxny_(sec, &nnx, &nny, &nnpnts, &nres, &nscan, &n_variable_dim, &variable_dim, &raw_variable_dim)
+
+	if nnx < 1 || nny < 1 {
+		return fprintf("Sorry code does not handle variable nx/ny yet\n")
+	}
+
+	earth_radius, err := radius_earth(sec)
+	if err != nil {
+		return fatal_error_wrap(err, "Failed to execute radius_earth")
+	}
+	gds = sec[3]
+	dy = GDS_Lambert_dy(gds)
+	dx = GDS_Lambert_dx(gds)
+	lat1r = GDS_Lambert_La1(gds) * (M_PI / 180.0)
+	lon1r = GDS_Lambert_Lo1(gds) * (M_PI / 180.0)
+	lon2d = GDS_Lambert_Lov(gds)
+	lon2r = lon2d * (M_PI / 180.0)
+	latin1r = GDS_Lambert_Latin1(gds) * (M_PI / 180.0)
+	latin2r = GDS_Lambert_Latin2(gds) * (M_PI / 180.0)
+
+	//  fix for theta start value crossing 0 longitude
+	//    if ((lon1r - lon2r) > 0) lon2r = lon2r + 2*M_PI;
+
+	//
+	// Latitude of "false origin" where scales are defined.
+	// It is used to estimate "reference_R", rhoref.
+	// Often latDr == latin1r == latin2r and non-modified code is true and works fine.
+	// But could be different if intersection latitudes latin1r and latin2r are different.
+	// Usually latDr must be latin1r <=  latDr <= latin2r, other could be strange.
+	//
+	latDr = GDS_Lambert_LatD(gds) * (M_PI / 180.0)
+
+	if lon1r < 0 {
+		return fatal_error("bad GDS, lon1r < 0.0", "")
+	}
+
+	if fabs(latin1r-latin2r) < 1E-09 {
+		n = sin(latin1r)
+	} else {
+		n = log(cos(latin1r)/cos(latin2r)) /
+			log(tan(M_PI_4+latin2r/2.0)/tan(M_PI_4+latin1r/2.0))
+	}
+
+	f = (cos(latin1r) * pow(tan(M_PI_4+latin1r/2.0), n)) / n
+
+	rho = earth_radius * f * pow(tan(M_PI_4+lat1r/2.0), -n)
+	// old rhoref = earth_radius * f * pow(tan(M_PI_4 + latin1r/2.0),-n);
+	rhoref = earth_radius * f * pow(tan(M_PI_4+latDr/2.0), -n)
+
+	// 2/2009 .. new code
+	d_lon = lon1r - lon2r
+	if d_lon > M_PI {
+		d_lon -= 2 * M_PI
+	}
+	if d_lon < -M_PI {
+		d_lon += 2 * M_PI
+	}
+	theta = n * d_lon
+	// 2/2009 theta = n * (lon1r - lon2r);
+
+	startx = rho * sin(theta)
+	starty = rhoref - rho*cos(theta)
+
+	/*
+		if ((*llat = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+			fatal_error("lambert2ll memory allocation failed","");
+		}
+		if ((*llon = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+			fatal_error("lambert2ll memory allocation failed","");
+		}
+	*/
+	*llat = make([]double, nnpnts, nnpnts)
+	*llat = make([]double, nnpnts, nnpnts)
+
+	lat = *llat
+	lon = *llon
+
+	/* put x[] and y[] values in lon[] and lat[] */
+	if err := stagger(sec, nnpnts, lon, lat, &n_variable_dim, &variable_dim, &raw_variable_dim); err != nil {
+		fatal_error_wrap(err, "geo: stagger problem")
+	}
+
+	dx = fabs(dx)
+	dy = fabs(dy)
+
+	//	#pragma omp parallel for private(j,x,y,tmp,theta,rho,lond,latd)
+	for j = 0; j < nnpnts; j++ {
+		y = starty + lat[j]*dy
+		x = startx + lon[j]*dx
+		tmp = rhoref - y
+		theta = atan(x / tmp)
+		rho = sqrt(x*x + tmp*tmp)
+		//rho = n > 0 ? rho : -rho;
+		if n > 0 {
+			rho = rho
+		} else {
+			rho = -rho
+		}
+		lond = lon2d + todegrees(theta/n)
+		latd = todegrees(2.0*atan(pow(earth_radius*f/rho, 1.0/n)) - M_PI_2)
+		// lond = lond >= 360.0 ? lond - 360.0 : lond;
+		if lond >= 360.0 {
+			lond = lond - 360.0
+		}
+		// lond = lond < 0.0 ? lond + 360.0 : lond;
+		if lond < 0.0 {
+			lond = lond + 360.0
+		}
+		lon[j] = lond
+		lat[j] = latd
+	}
+	return nil
+} /* end lambert2ll() */

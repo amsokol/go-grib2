@@ -54,8 +54,7 @@ func get_latlon(sec [][]unsigned_char, lon *[]double, lat *[]double) error {
 	} else if grid_template == 20 {
 		polar2ll(sec, lat, lon)
 	} else if grid_template == 30 {
-		// TODO: port lambert2ll
-		// lambert2ll(sec, lat, lon)
+		lambert2ll(sec, lat, lon)
 	} else if grid_template == 40 {
 		// TODO: port gauss2ll
 		// gauss2ll(sec, lat, lon)

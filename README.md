@@ -70,7 +70,7 @@ See the following usage examples:
 
 Major work is finished. `go-grib2` is ready to use. I have a little bit to port:
 
-- parse `longitude` and `latitude` are stored as `lambert`, `gauss`, `space_view`, `irr_grid`
+- parse `longitude` and `latitude` are stored as `gauss`, `space_view`, `irr_grid`
 - parse data are stored using `complex` and `run_length` algorithms
 
 ## Issues
