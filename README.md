@@ -1,4 +1,4 @@
-# GRIB2 library for golang
+# GRIB2 library for Go programming language (golang)
 
 ## History
 
@@ -18,7 +18,7 @@ There was the reference GRIB2 implementation - [wgrib2](http://www.cpc.ncep.noaa
 
 - I prefer pure golang libraries
 
-I saw the only one way - to port `wgrib2` to golang. I did not want to repeat approach of another libraries. I was not going to rewrite `wgrib2` to golang. I decided to port `wgrib2` engine `C` code with minimal correction and develop simple golang wrapper. I used results of `wgrib2` export to CSV as the reference for testing. That approach allows:
+I saw the only one way - to port `wgrib2` to golang. I did not want to repeat approach of another libraries. I was not going to rewrite `wgrib2` to golang. I decided to port `wgrib2` engine `C` code to `golang` with minimal correction and develop simple wrapper. I used results of `wgrib2` export to CSV as the reference for testing. That approach allows:
 
 - safe time (porting spent few days only)
 - easy apply new features and patches from original `wgrib2` development stream
