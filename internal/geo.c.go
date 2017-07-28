@@ -385,3 +385,116 @@ func mercator2ll(sec [][]unsigned_char, lat *[]double, lon *[]double) error {
 	}
 	return nil
 } /* end mercator2ll() */
+
+func polar2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
+
+	var lat, lon []double
+	var gds []unsigned_char
+
+	var dx, dy, orient, de, de2, dr, tmp, xp, yp, h, lat1, lon1, dr2 double
+	var di, dj, LatD double
+	var ix, iy unsigned_int
+	var nnx, nny unsigned_int
+	var nres, nscan int
+	var nnpnts unsigned_int
+	var nx size_t
+
+	var n_variable_dim int
+	var variable_dim, raw_variable_dim []int
+
+	get_nxny_(sec, &nnx, &nny, &nnpnts, &nres, &nscan, &n_variable_dim, &variable_dim, &raw_variable_dim)
+
+	gds = sec[3]
+
+	if nnx < 1 || nny < 1 {
+		return fprintf("Sorry code does not handle variable nx/ny yet\n")
+	}
+	nx = size_t(nnx) /* size_t, multiplications will not overflow */
+
+	/*
+			if ((*llat = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+		        fatal_error("polar2ll memory allocation failed","");
+		    }
+		    if ((*llon = (double *) malloc(((size_t) nnpnts) * sizeof(double))) == NULL) {
+		        fatal_error("polar2ll memory allocation failed","");
+			}
+	*/
+	*llat = make([]double, nnpnts, nnpnts)
+	*llat = make([]double, nnpnts, nnpnts)
+
+	lat = *llat
+	lon = *llon
+
+	/* based on iplib */
+
+	lat1 = GDS_Polar_lat1(gds) * (M_PI / 180)
+	lon1 = GDS_Polar_lon1(gds)
+	orient = GDS_Polar_lov(gds)
+	LatD = GDS_Polar_lad(gds)
+
+	lon1 *= (M_PI / 180.0)
+	orient *= (M_PI / 180.0)
+
+	dy = GDS_Polar_dy(gds)
+	dx = GDS_Polar_dx(gds)
+
+	h = 1.0
+	if GDS_Polar_sps(gds) {
+		h = -1.0
+		/* added 12/19/2008 WNE sps checkout */
+		orient -= M_PI
+	}
+
+	// removed 12/11    if (! (GDS_Scan_x(nscan))) dx = -dx;
+	// removed 12/11    if (! (GDS_Scan_y(nscan))) dy = -dy;
+
+	/* 60 probably becomes something else in grib2 */
+	/* vsm: from comment to grib2 polar template:
+	   "Grid length is in units of 10-3 m at the latitude specified by LaD"
+	    do use GDS_Polar_lad(gds) instead of 60?
+	    Do use fabs for southern hemisphere?
+	*/
+
+	radius, err := radius_earth(sec)
+	if err != nil {
+		return fatal_error_wrap(err, "Failed to execute radius_earth")
+	}
+	de = (1.0 + sin(fabs(LatD)*(M_PI/180.0))) * radius
+	dr = de * cos(lat1) / (1 + h*sin(lat1))
+
+	xp = -h * sin(lon1-orient) * dr / dx
+	yp = cos(lon1-orient) * dr / dy
+
+	// added 12/11
+	if !(GDS_Scan_y(nscan)) {
+		yp = yp - double(nny) + 1
+	}
+	if !(GDS_Scan_x(nscan)) {
+		xp = xp - double(nnx) + 1
+	}
+
+	de2 = de * de
+	//#pragma omp parallel for private(iy,ix,di,dj,dr2,tmp)
+	for iy = 0; iy < nny; iy++ {
+		for ix = 0; ix < nnx; ix++ {
+			di = (double(ix) - xp) * dx
+			dj = (double(iy) - yp) * dy
+			dr2 = di*di + dj*dj
+			if dr2 < de2*1e-6 {
+				lon[ix+iy*unsigned_int(nx)] = 0.0
+				lat[ix+iy*unsigned_int(nx)] = h * 90.0
+			} else {
+				tmp = (orient + h*atan2(di, -dj)) * (180.0 / M_PI)
+				if tmp < 0.0 {
+					tmp += 360.0
+				}
+				if tmp > 360.0 {
+					tmp -= 360.0
+				}
+				lon[ix+iy*unsigned_int(nx)] = tmp
+				lat[ix+iy*unsigned_int(nx)] = h * asin((de2-dr2)/(de2+dr2)) * (180.0 / M_PI)
+			}
+		}
+	}
+	return nil
+}

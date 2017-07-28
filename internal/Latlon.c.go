@@ -52,8 +52,7 @@ func get_latlon(sec [][]unsigned_char, lon *[]double, lat *[]double) error {
 	} else if grid_template == 10 {
 		mercator2ll(sec, lat, lon)
 	} else if grid_template == 20 {
-		// TODO: port polar2ll
-		// polar2ll(sec, lat, lon)
+		polar2ll(sec, lat, lon)
 	} else if grid_template == 30 {
 		// TODO: port lambert2ll
 		// lambert2ll(sec, lat, lon)

@@ -14,6 +14,7 @@ type char byte
 type unsigned_int uint
 type double float64
 type float float32
+type size_t unsigned_int
 
 /*
 unsigned int uint4(unsigned const char *p) {

@@ -176,3 +176,38 @@ func GDS_Mercator_ori_angle(gds []unsigned_char) double {
 func GDS_Mercator_latD(gds []unsigned_char) double {
 	return double(int4(gds[47:])) * 0.000001
 }
+
+// #define GDS_Polar_lat1(gds)		(int4(gds+38)*0.000001)
+func GDS_Polar_lat1(gds []unsigned_char) double {
+	return double(int4(gds[38:])) * 0.000001
+}
+
+// #define GDS_Polar_lon1(gds)		(uint4(gds+42)*0.000001)
+func GDS_Polar_lon1(gds []unsigned_char) double {
+	return double(uint4(gds[42:])) * 0.000001
+}
+
+// #define GDS_Polar_lov(gds)		(uint4(gds+51)*0.000001)
+func GDS_Polar_lov(gds []unsigned_char) double {
+	return double(uint4(gds[51:])) * 0.000001
+}
+
+// #define GDS_Polar_lad(gds)		(int4(gds+47)*0.000001)
+func GDS_Polar_lad(gds []unsigned_char) double {
+	return double(int4(gds[47:])) * 0.000001
+}
+
+// #define GDS_Polar_dx(gds)		(uint4(gds+55)*0.001)
+func GDS_Polar_dx(gds []unsigned_char) double {
+	return double(uint4(gds[55:])) * 0.001
+}
+
+// #define GDS_Polar_dy(gds)		(uint4(gds+59)*0.001)
+func GDS_Polar_dy(gds []unsigned_char) double {
+	return double(uint4(gds[59:])) * 0.001
+}
+
+// #define GDS_Polar_sps(gds)		((gds[63] & 128) == 128)
+func GDS_Polar_sps(gds []unsigned_char) bool {
+	return (gds[63] & 128) == 128
+}
