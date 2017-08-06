@@ -48,13 +48,13 @@ func get_latlon(sec [][]unsigned_char, lon *[]double, lat *[]double) error {
 	if grid_template == 0 {
 		return regular2ll(sec, lat, lon)
 	} else if grid_template == 1 { // rotated lat-lon
-		rot_regular2ll(sec, lat, lon)
+		return rot_regular2ll(sec, lat, lon)
 	} else if grid_template == 10 {
-		mercator2ll(sec, lat, lon)
+		return mercator2ll(sec, lat, lon)
 	} else if grid_template == 20 {
-		polar2ll(sec, lat, lon)
+		return polar2ll(sec, lat, lon)
 	} else if grid_template == 30 {
-		lambert2ll(sec, lat, lon)
+		return lambert2ll(sec, lat, lon)
 	} else if grid_template == 40 {
 		// TODO: port gauss2ll
 		// gauss2ll(sec, lat, lon)
