@@ -6,6 +6,7 @@ import (
 
 	"github.com/amsokol/go-grib2/internal"
 	"github.com/pkg/errors"
+	"log"
 )
 
 // GRIB2 is simplified GRIB2 file structure
@@ -89,6 +90,9 @@ func Read(data []byte) ([]GRIB2, error) {
 					return nil, errors.Wrapf(err, "Failed to get longitude and latitude")
 				}
 				raw, err := internal.UnpackData(sections)
+				if err != nil {
+					log.Fatal(err)
+				}
 				c := len(lon)
 				v := make([]Value, c, c)
 				for i := 0; i < c; i++ {
