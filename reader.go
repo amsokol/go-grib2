@@ -6,7 +6,6 @@ import (
 
 	"github.com/amsokol/go-grib2/internal"
 	"github.com/pkg/errors"
-	"log"
 )
 
 // GRIB2 is simplified GRIB2 file structure
@@ -91,7 +90,7 @@ func Read(data []byte) ([]GRIB2, error) {
 				}
 				raw, err := internal.UnpackData(sections)
 				if err != nil {
-					log.Fatal(err)
+					return nil, errors.Wrapf(err, "Failed to unpack data")
 				}
 				c := len(lon)
 				v := make([]Value, c, c)
