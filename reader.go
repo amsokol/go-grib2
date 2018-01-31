@@ -89,6 +89,9 @@ func Read(data []byte) ([]GRIB2, error) {
 					return nil, errors.Wrapf(err, "Failed to get longitude and latitude")
 				}
 				raw, err := internal.UnpackData(sections)
+				if err != nil {
+					return nil, errors.Wrapf(err, "Failed to unpack data")
+				}
 				c := len(lon)
 				v := make([]Value, c, c)
 				for i := 0; i < c; i++ {
