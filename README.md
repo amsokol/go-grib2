@@ -80,3 +80,7 @@ Major work is finished. `go-grib2` is ready to use. I have a little bit to port:
 ## Need help
 
 I need help is testing. Please test `go-grib2` with several GRIB2 files from several providers. Use `wgrib2` CSV export to validate results. Please create issues here.
+
+## If you need fully functional GRIB2 librarry look at the my golang wrapper for ecCodes
+[go-eccodes](https://github.com/amsokol/go-eccodes)
+
