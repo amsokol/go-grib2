@@ -25,7 +25,7 @@ func add_dt(year *int, month *int, day *int, hour *int, minute *int, second *int
 	if unit == 255 || unit == -1 {
 		return
 	} // no valid time unit
-	if dtime == 0xffffffff {
+	if int64(dtime) == 0xffffffff {
 		return
 	} // missing dtime
 

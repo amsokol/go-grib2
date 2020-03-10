@@ -26,7 +26,7 @@ func uint4_missing(p []unsigned_char) unsigned_int {
 	t = t<<8 | int(p[2])
 	t = t<<8 | int(p[3])
 
-	if t == 0xffffffff {
+	if int64(t) == 0xffffffff {
 		return 0
 	}
 	return unsigned_int(t)
