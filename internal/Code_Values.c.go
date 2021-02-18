@@ -141,3 +141,43 @@ func fixed_surfaces(sec [][]unsigned_char, type1 *int, surface1 *float, undef_va
 	}
 	return nil
 }
+
+func sub_missing_values(sec [][]unsigned_char, missing1, missing2 *float) int {
+
+	i := code_table_5_5(sec)
+	if i < 1 || i > 2 {
+		return 0
+	}
+	j := code_table_5_1(sec)
+	p := sec[5]
+	if j == 0 { // ieee
+		if p[23] == 255 && p[24] == 255 && p[25] == 255 && p[26] == 255 {
+			*missing1 = UNDEFINED
+		} else {
+			*missing1 = ieee2flt(p[23:])
+		}
+		if i == 2 {
+			if p[27] == 255 && p[28] == 255 && p[29] == 255 && p[30] == 255 {
+				*missing1 = UNDEFINED
+			} else {
+				*missing2 = ieee2flt(p[27:])
+			}
+		}
+	} else if j == 1 { // integer
+		if p[23] == 255 && p[24] == 255 && p[25] == 255 && p[26] == 255 {
+			*missing1 = UNDEFINED
+		} else {
+			*missing1 = 0
+			int4(p[23:])
+		}
+		if i == 2 {
+			if p[27] == 255 && p[28] == 255 && p[29] == 255 && p[30] == 255 {
+				*missing1 = UNDEFINED
+			} else {
+				*missing2 = 0
+				int4(p[27:])
+			}
+		}
+	}
+	return i
+}

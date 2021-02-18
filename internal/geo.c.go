@@ -427,7 +427,7 @@ func polar2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
 			}
 	*/
 	*llat = make([]double, nnpnts, nnpnts)
-	*llat = make([]double, nnpnts, nnpnts)
+	*llon = make([]double, nnpnts, nnpnts)
 
 	lat = *llat
 	lon = *llon
@@ -561,7 +561,7 @@ func lambert2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
 		return fatal_error("bad GDS, lon1r < 0.0", "")
 	}
 
-	if fabs(latin1r-latin2r) < 1E-09 {
+	if fabs(latin1r-latin2r) < 1e-09 {
 		n = sin(latin1r)
 	} else {
 		n = log(cos(latin1r)/cos(latin2r)) /
@@ -597,7 +597,7 @@ func lambert2ll(sec [][]unsigned_char, llat *[]double, llon *[]double) error {
 		}
 	*/
 	*llat = make([]double, nnpnts, nnpnts)
-	*llat = make([]double, nnpnts, nnpnts)
+	*llon = make([]double, nnpnts, nnpnts)
 
 	lat = *llat
 	lon = *llon
