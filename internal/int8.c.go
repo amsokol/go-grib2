@@ -63,6 +63,39 @@ func uint2(p []unsigned_char) unsigned_int {
 	return (unsigned_int(p[0]) << 8) + unsigned_int(p[1])
 }
 
+func int_n(p []unsigned_char, n int) int {
+	if n == 0 {
+		return 0
+	}
+
+	j := 0
+	sign := p[0]
+	pIndex := 0
+
+	for i := n; i > 1; i-- {
+		j = (j * 256) + int(p[pIndex])
+		pIndex++
+	}
+
+	if (sign & 0x80) != 0 {
+		j = -j
+	}
+
+	return j
+
+}
+
+func uint_n(p []unsigned_char, n int) unsigned_int {
+	j := unsigned_int(0)
+	pIndex := 0
+	for i := n; i > 0; i-- {
+		j = (j << 8) + unsigned_int(p[pIndex])
+		pIndex++
+	}
+	return j
+
+}
+
 //
 // floating point values are often represented as int * power of 10
 //

@@ -132,9 +132,7 @@ func unpk_grib(sec [][]unsigned_char, data []float) error {
 		}
 		return nil
 	} else if packing == 2 || packing == 3 { // complex
-		return fatal_error("unpk_complex is not supported")
-		// TODO: unpk_complex
-		// return unpk_complex(sec, data, ndata)
+		return unpk_complex(sec, data, ndata)
 	} else if packing == 200 { // run length
 		return fatal_error("unpk_run_length is not supported")
 		// TODO: unpk_run_length

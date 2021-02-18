@@ -202,3 +202,36 @@ func code_table_5_0(sec [][]unsigned_char) int {
 func code_table_6_0(sec [][]unsigned_char) int {
 	return int(sec[6][5])
 }
+
+func code_table_5_6(sec [][]unsigned_char) int {
+	if code_table_5_0(sec) != 3 {
+		return -1
+	}
+
+	return int(sec[5][47])
+}
+
+func code_table_5_4(sec [][]unsigned_char) int {
+	if code_table_5_0(sec) < 2 || code_table_5_0(sec) > 3 {
+		return -1
+	}
+
+	return int(sec[5][21])
+}
+
+func code_table_5_5(sec [][]unsigned_char) int {
+	if code_table_5_0(sec) < 2 || code_table_5_0(sec) > 3 {
+		return -1
+	}
+
+	return int(sec[5][22])
+}
+
+func code_table_5_1(sec [][]unsigned_char) int {
+	switch code_table_5_0(sec) {
+	case 0, 1, 2, 3, 40, 41, 42:
+		return (int)(sec[5][20])
+	default:
+		return -1
+	}
+}

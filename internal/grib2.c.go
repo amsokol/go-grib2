@@ -27,6 +27,13 @@ func GB2_Sec3_npts(sec [][]unsigned_char) unsigned_int {
 	return uint4(sec[3][6:])
 }
 
+func GB2_Sec5_nval(sec [][]unsigned_char) unsigned_int {
+	if sec[5] != nil {
+		return uint4(sec[5][5:])
+	}
+	return 0
+}
+
 // #define GDS_Scan_y(scan)		((scan & 64) == 64)
 func GDS_Scan_y(scan int) bool {
 	return (scan & 64) == 64
